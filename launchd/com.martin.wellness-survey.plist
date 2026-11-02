@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.martin.wellness-survey</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/opt/homebrew/bin/python3</string>
+    <string>/Users/martin/Documents/Documents - mini/Claude/wellness-survey/server/wellness_server.py</string>
+  </array>
+  <key>WorkingDirectory</key>
+  <string>/Users/martin/Documents/Documents - mini/Claude/wellness-survey</string>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>WELLNESS_RESULTS_KEY</key>
+    <string>REPLACE_WITH_A_RANDOM_SECRET_BEFORE_INSTALLING</string>
+    <key>WELLNESS_PORT</key>
+    <string>8787</string>
+    <key>WELLNESS_DATA_DIR</key>
+    <string>/Users/martin/.local/share/wellness-survey</string>
+  </dict>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+  <key>StandardOutPath</key>
+  <string>/Users/martin/Library/Logs/wellness-survey.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/martin/Library/Logs/wellness-survey.log</string>
+</dict>
+</plist>

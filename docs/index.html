@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <meta name="referrer" content="no-referrer">
+  <title>Wellness card</title>
+  <style>
+    :root {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 18px;
+      color: #24332d;
+      background: #f6f8f7;
+      line-height: 1.5;
+      accent-color: #23634b;
+    }
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    body { margin: 0; }
+    main { max-width: 38rem; margin: 0 auto; padding: 2rem 1rem 3rem; }
+    h1 { margin: 0; font-size: 2rem; line-height: 1.2; letter-spacing: -0.03em; }
+    header p { margin: 0.75rem 0 2rem; color: #52635a; }
+    fieldset { min-width: 0; border: 0; margin: 0 0 1.75rem; padding: 0; }
+    legend, .text-label { padding: 0; margin-bottom: 0.75rem; font-weight: 600; }
+    .choices { display: grid; gap: 0.6rem; }
+    .binary { grid-template-columns: 1fr 1fr; }
+    .freq .choice span { min-height: 2.6rem; padding: 0.6rem 0.8rem; }
+    .choice { display: block; position: relative; cursor: pointer; }
+    .choice input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: 0;
+      opacity: 0;
+    }
+    .choice span {
+      display: block;
+      border: 2px solid #a9b7af;
+      border-radius: 0.5rem;
+      padding: 0.8rem;
+      min-height: 3rem;
+      background: #fff;
+    }
+    .binary span { text-align: center; }
+    .choice input:checked + span {
+      border-color: #23634b;
+      background: #e4f0e9;
+      box-shadow: inset 0 0 0 1px #23634b;
+    }
+    .choice input:focus-visible + span, textarea:focus-visible, button:focus-visible {
+      outline: 3px solid #23634b;
+      outline-offset: 3px;
+    }
+    .text-label { display: block; }
+    textarea {
+      display: block;
+      width: 100%;
+      min-height: 8rem;
+      resize: vertical;
+      border: 2px solid #a9b7af;
+      border-radius: 0.5rem;
+      padding: 0.8rem;
+      font: inherit;
+      color: inherit;
+      background: #fff;
+    }
+    .hint { color: #52635a; margin: 0.4rem 0 1.5rem; }
+    button {
+      display: block;
+      width: 100%;
+      min-height: 3.25rem;
+      border: 0;
+      border-radius: 0.5rem;
+      padding: 0.8rem;
+      font: inherit;
+      font-weight: 600;
+      color: #fff;
+      background: #23634b;
+      cursor: pointer;
+    }
+    button:disabled { background: #d9e1dc; color: #52635a; cursor: default; }
+    #status { min-height: 1.5rem; margin: 0.75rem 0 0; color: #8a2929; }
+    #thanks { border-top: 2px solid #a9b7af; padding-top: 1rem; }
+    #thanks p { margin: 0 0 1rem; }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Wellness card</h1>
+      <p>no names, no PGY year. takes about 45 seconds. paper or phone, not both.</p>
+    </header>
+    <form id="card" autocomplete="off">
+      <!-- Add questions as a fieldset with named inputs; the script collects them. -->
+      <fieldset>
+        <legend>1. I feel burned out from my work.</legend>
+        <div class="choices freq">
+          <label class="choice"><input type="radio" name="burnout_ee" value="never"><span>Never</span></label>
+          <label class="choice"><input type="radio" name="burnout_ee" value="few_times_year"><span>A few times a year or less</span></label>
+          <label class="choice"><input type="radio" name="burnout_ee" value="monthly"><span>Once a month or less</span></label>
+          <label class="choice"><input type="radio" name="burnout_ee" value="few_times_month"><span>A few times a month</span></label>
+          <label class="choice"><input type="radio" name="burnout_ee" value="weekly"><span>Once a week</span></label>
+          <label class="choice"><input type="radio" name="burnout_ee" value="few_times_week"><span>A few times a week</span></label>
+          <label class="choice"><input type="radio" name="burnout_ee" value="daily"><span>Every day</span></label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>2. I have become more callous toward people since I took this job.</legend>
+        <div class="choices freq">
+          <label class="choice"><input type="radio" name="burnout_dp" value="never"><span>Never</span></label>
+          <label class="choice"><input type="radio" name="burnout_dp" value="few_times_year"><span>A few times a year or less</span></label>
+          <label class="choice"><input type="radio" name="burnout_dp" value="monthly"><span>Once a month or less</span></label>
+          <label class="choice"><input type="radio" name="burnout_dp" value="few_times_month"><span>A few times a month</span></label>
+          <label class="choice"><input type="radio" name="burnout_dp" value="weekly"><span>Once a week</span></label>
+          <label class="choice"><input type="radio" name="burnout_dp" value="few_times_week"><span>A few times a week</span></label>
+          <label class="choice"><input type="radio" name="burnout_dp" value="daily"><span>Every day</span></label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>3. Do you have a mentor who genuinely cares about you and your career?</legend>
+        <div class="choices binary">
+          <label class="choice"><input type="radio" name="mentor" value="yes"><span>Yes</span></label>
+          <label class="choice"><input type="radio" name="mentor" value="no"><span>No</span></label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>4. Are you satisfied with how responsive the program is to resident concerns?</legend>
+        <div class="choices binary">
+          <label class="choice"><input type="radio" name="responsive" value="yes"><span>Yes</span></label>
+          <label class="choice"><input type="radio" name="responsive" value="no"><span>No</span></label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>5. Are you unhappy with the time you have for routine health maintenance (doctor, dentist)?</legend>
+        <div class="choices binary">
+          <label class="choice"><input type="radio" name="health_time" value="yes"><span>Yes</span></label>
+          <label class="choice"><input type="radio" name="health_time" value="no"><span>No</span></label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>6. Fix first (pick one):</legend>
+        <div class="choices">
+          <label class="choice"><input type="radio" name="fix_first" value="A"><span>A) a monthly "here's what changed" on what comes in through the anonymous channel</span></label>
+          <label class="choice"><input type="radio" name="fix_first" value="B"><span>B) Big Sib: every intern gets a senior who isn't grading them</span></label>
+          <label class="choice"><input type="radio" name="fix_first" value="C"><span>C) out by 10 actually means out by 10, and someone covers</span></label>
+          <label class="choice"><input type="radio" name="fix_first" value="D"><span>D) protected didactics actually protected</span></label>
+          <label class="choice"><input type="radio" name="fix_first" value="E"><span>E) float: Friday chief chat, real resident input on schedules</span></label>
+          <label class="choice"><input type="radio" name="fix_first" value="F"><span>F) workroom: 3 more computers and a printer that actually works</span></label>
+        </div>
+      </fieldset>
+      <label class="text-label" for="free-text">7. One thing that makes the day worse and could actually be fixed (optional)</label>
+      <textarea id="free-text" name="free_text" maxlength="500" rows="4"></textarea>
+      <div hidden aria-hidden="true">
+        <label for="website">Website</label>
+        <input id="website" type="text" name="website" tabindex="-1" autocomplete="off">
+      </div>
+      <p class="hint" id="send-hint">Answer at least one item to send.</p>
+      <button id="send" type="submit" aria-describedby="send-hint" disabled>Send it</button>
+      <p id="status" role="status" aria-live="polite"></p>
+      <noscript><p>Turn on JavaScript to send this card, or use the paper card.</p></noscript>
+    </form>
+    <section id="thanks" tabindex="-1" hidden>
+      <p>Thanks. For comparison, nationally: 38-43% of general surgery residents have weekly burnout symptoms, 67% have a mentor who genuinely cares, 72% are satisfied with program responsiveness, 48% are unhappy with time for their own doctor/dentist.</p>
+      <p>You can close this.</p>
+    </section>
+  </main>
+  <script>
+    const API_BASE = "https://mini.tailf65cf9.ts.net:10000";
+
+    const form = document.getElementById("card");
+    const send = document.getElementById("send");
+    const status = document.getElementById("status");
+    const thanks = document.getElementById("thanks");
+    let sending = false;
+
+    function hasAnswer() {
+      return Array.from(new FormData(form)).some(([name, value]) =>
+        name !== "website" && value.trim().length > 0
+      );
+    }
+
+    function updateButton() {
+      send.disabled = sending || !hasAnswer();
+    }
+
+    function showThanks(focus = false) {
+      form.hidden = true;
+      thanks.hidden = false;
+      if (focus) thanks.focus();
+    }
+
+    try {
+      if (localStorage.wellnessCardSent === "1") showThanks();
+    } catch (_) {
+      // Private browsing can make storage unavailable; the card still works.
+    }
+
+    form.addEventListener("input", updateButton);
+    form.addEventListener("change", updateButton);
+    updateButton();
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (sending || !hasAnswer()) return;
+      const answers = Object.fromEntries(new FormData(form));
+      sending = true;
+      updateButton();
+      send.textContent = "Sending...";
+      status.textContent = "";
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 15000);
+
+      try {
+        const response = await fetch(API_BASE + "/api/submit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(answers),
+          credentials: "omit",
+          referrerPolicy: "no-referrer",
+          signal: controller.signal
+        });
+        if (!response.ok) {
+          throw new Error(response.status === 429
+            ? "Too many cards at once. Wait a minute, then try again."
+            : "The card could not be sent. Try again, or use the paper card.");
+        }
+        const result = await response.json();
+        if (result.ok !== true) throw new Error("The card could not be sent. Try again, or use the paper card.");
+        try {
+          localStorage.wellnessCardSent = 1;
+        } catch (_) {
+          // A saved response still gets a thank-you when storage is unavailable.
+        }
+        showThanks(true);
+      } catch (error) {
+        status.textContent = error.name === "AbortError" || error instanceof TypeError
+          ? "Could not confirm the send. Check your connection and try again, or use the paper card."
+          : error.message;
+      } finally {
+        clearTimeout(timeout);
+        sending = false;
+        send.textContent = "Send it";
+        updateButton();
+      }
+    });
+  </script>
+</body>
+</html>
