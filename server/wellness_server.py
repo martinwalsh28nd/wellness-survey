@@ -178,7 +178,7 @@ class WellnessServer(ThreadingHTTPServer):
                 else:
                     del self.post_times[client]
             times = self.post_times.setdefault(address, [])
-            if len(times) >= 10:
+            if len(times) >= 30:
                 return False
             times.append(now)
             return True
@@ -195,8 +195,16 @@ class WellnessServer(ThreadingHTTPServer):
     def read_responses(self):
         with self.storage_lock:
             try:
+                responses = []
                 with self.data_file.open(encoding="utf-8") as stream:
-                    return [json.loads(line) for line in stream if line.strip()]
+                    for line in stream:
+                        if not line.strip():
+                            continue
+                        try:
+                            responses.append(json.loads(line))
+                        except ValueError:
+                            continue  # a torn line must not take the tally down
+                return responses
             except FileNotFoundError:
                 return []
 
@@ -206,6 +214,8 @@ class WellnessServer(ThreadingHTTPServer):
 
 
 class WellnessHandler(BaseHTTPRequestHandler):
+    server_version = "wellness"
+    sys_version = ""
     def setup(self):
         super().setup()
         self.connection.settimeout(10)
@@ -253,16 +263,14 @@ class WellnessHandler(BaseHTTPRequestHandler):
         markers = self.headers.get_all("Tailscale-Funnel-Request", [])
         # Funnel overwrites both headers; trust them only on the local proxy hop.
         if ipaddress.ip_address(peer).is_loopback and markers == ["?1"] and len(forwarded) == 1:
+            first_hop = forwarded[0].split(",", 1)[0].strip()
             try:
-                return str(ipaddress.ip_address(forwarded[0]))
+                return str(ipaddress.ip_address(first_hop))
             except ValueError:
                 pass
         return peer
 
     def do_POST(self):
-        if not self.server.admit_post(self.rate_address()):
-            self.respond(429, {"error": "Too many submissions. Try again in a minute."})
-            return
         if self.path.partition("?")[0] != "/api/submit":
             self.respond(404, {"error": "Not found."})
             return
@@ -289,6 +297,9 @@ class WellnessHandler(BaseHTTPRequestHandler):
             self.respond(400, {"error": "Invalid answers or JSON body."})
             return
         if answers is not None:
+            if not self.server.admit_post(self.rate_address()):
+                self.respond(429, {"error": "Too many submissions. Try again in a minute."})
+                return
             try:
                 self.server.append_response(answers)
             except OSError:
