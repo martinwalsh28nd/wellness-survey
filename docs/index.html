@@ -89,7 +89,7 @@
   <main>
     <header>
       <h1>Wellness card</h1>
-      <p>no names, no PGY year. takes about 45 seconds.</p>
+      <p>no names, no PGY year. takes about a minute.</p>
     </header>
     <form id="card" autocomplete="off">
       <!-- Add questions as a fieldset with named inputs; the script collects them. -->
@@ -139,7 +139,27 @@
         </div>
       </fieldset>
       <fieldset>
-        <legend>6. Fix first (pick one):</legend>
+        <legend>6. Since starting residency, how often have you been mistreated: bullied, verbally or emotionally abused, physically abused, discriminated against, or sexually harassed?</legend>
+        <div class="choices freq">
+          <label class="choice"><input type="radio" name="mistreat_freq" value="never"><span>Never</span></label>
+          <label class="choice"><input type="radio" name="mistreat_freq" value="few_times_year"><span>A few times a year</span></label>
+          <label class="choice"><input type="radio" name="mistreat_freq" value="few_times_month"><span>A few times a month</span></label>
+          <label class="choice"><input type="radio" name="mistreat_freq" value="few_times_week"><span>A few times a week</span></label>
+          <label class="choice"><input type="radio" name="mistreat_freq" value="daily"><span>Daily</span></label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>7. If ever, by whom? (pick all that apply)</legend>
+        <div class="choices">
+          <label class="choice"><input type="checkbox" name="mistreat_from" value="attendings"><span>Attendings</span></label>
+          <label class="choice"><input type="checkbox" name="mistreat_from" value="residents"><span>Other residents or fellows</span></label>
+          <label class="choice"><input type="checkbox" name="mistreat_from" value="patients"><span>Patients or families</span></label>
+          <label class="choice"><input type="checkbox" name="mistreat_from" value="staff"><span>Nurses or other staff</span></label>
+          <label class="choice"><input type="checkbox" name="mistreat_from" value="admin"><span>Administrators</span></label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>8. Fix first (pick one):</legend>
         <div class="choices">
           <label class="choice"><input type="radio" name="fix_first" value="A"><span>A) a monthly "here's what changed" on what comes in through the anonymous channel</span></label>
           <label class="choice"><input type="radio" name="fix_first" value="B"><span>B) Big Sib: every intern gets a senior who isn't grading them</span></label>
@@ -149,7 +169,7 @@
           <label class="choice"><input type="radio" name="fix_first" value="F"><span>F) workroom: 3 more computers and a printer that works</span></label>
         </div>
       </fieldset>
-      <label class="text-label" for="free-text">7. One thing that makes the day worse and could be fixed (optional)</label>
+      <label class="text-label" for="free-text">9. One thing that makes the day worse and could be fixed (optional)</label>
       <textarea id="free-text" name="free_text" maxlength="500" rows="4"></textarea>
       <div hidden aria-hidden="true">
         <label for="website">Website</label>
@@ -167,7 +187,7 @@
       <p id="pending-status" role="status" aria-live="polite"></p>
     </section>
     <section id="thanks" tabindex="-1" hidden>
-      <p>Thanks. For comparison, nationally: 38-43% of general surgery residents have weekly burnout symptoms, 67% have a mentor who genuinely cares, 72% are satisfied with program responsiveness, 48% are unhappy with time for their own doctor/dentist.</p>
+      <p>Thanks. For comparison, nationally: 38-43% of general surgery residents have weekly burnout symptoms, 67% have a mentor who genuinely cares, 72% are satisfied with program responsiveness, 48% are unhappy with time for their own doctor/dentist, and about half report some mistreatment since starting residency.</p>
       <p>You can close this.</p>
     </section>
   </main>
@@ -293,7 +313,8 @@
     form.addEventListener("submit", (event) => {
       event.preventDefault();
       if (sending || !hasAnswer()) return;
-      pendingCard = { ...Object.fromEntries(new FormData(form)), card_id: newId() };
+      const data = new FormData(form);
+      pendingCard = { ...Object.fromEntries(data), mistreat_from: data.getAll("mistreat_from"), card_id: newId() };
       save(PENDING_KEY, JSON.stringify(pendingCard));
       status.textContent = "";
       attempt(true);

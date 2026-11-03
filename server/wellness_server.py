@@ -30,6 +30,9 @@ FREQUENCIES = (
     "weekly", "few_times_week", "daily",
 )
 FIX_OPTIONS = tuple("ABCDEF")
+# Mistreatment: frequency scale and sources as in Hu et al., N Engl J Med 2019.
+MISTREAT_FREQ = ("never", "few_times_year", "few_times_month", "few_times_week", "daily")
+MISTREAT_SOURCES = ("attendings", "residents", "patients", "staff", "admin")
 CONTROLS = re.compile(r"[\x00-\x1f\x7f-\x9f]")
 MAX_BODY = 4096
 
@@ -66,6 +69,17 @@ def validate_answers(payload):
             if not isinstance(value, str) or value not in FREQUENCIES:
                 raise ValueError("Invalid burnout frequency.")
             answers[field] = value
+    freq = payload.get("mistreat_freq", "")
+    if not isinstance(freq, str) or freq not in ("", *MISTREAT_FREQ):
+        raise ValueError("Invalid mistreatment frequency.")
+    if freq:
+        answers["mistreat_freq"] = freq
+    sources = payload.get("mistreat_from", [])
+    if not isinstance(sources, list) or len(sources) > len(MISTREAT_SOURCES) or any(
+            not isinstance(s, str) or s not in MISTREAT_SOURCES for s in sources):
+        raise ValueError("Invalid mistreatment source.")
+    if sources:
+        answers["mistreat_from"] = [s for s in MISTREAT_SOURCES if s in sources]
     card_id = payload.get("card_id")
     if card_id is not None:
         # Random per-card token from the phone; lets a retry after a lost reply
@@ -85,7 +99,18 @@ def summarize(responses):
     counts = {field: {"yes": 0, "no": 0, "blank": 0} for field in YES_NO_FIELDS}
     fixes = {option: 0 for option in (*FIX_OPTIONS, "blank")}
     burnout = {}
+    mistreat = {"freq": dict.fromkeys(MISTREAT_FREQ, 0), "any": 0, "answered": 0,
+                "from": dict.fromkeys(MISTREAT_SOURCES, 0)}
     for response in responses:
+        freq = response.get("mistreat_freq")
+        if freq in mistreat["freq"]:
+            mistreat["freq"][freq] += 1
+            mistreat["answered"] += 1
+            if freq != "never":
+                mistreat["any"] += 1
+        for source in response.get("mistreat_from") or []:
+            if source in mistreat["from"]:
+                mistreat["from"][source] += 1
         for field in YES_NO_FIELDS:
             counts[field][response.get(field) or "blank"] += 1
         fixes[response.get("fix_first") or "blank"] += 1
@@ -101,16 +126,22 @@ def summarize(responses):
 
     columns = ["ts", *ANSWER_FIELDS]
     columns.extend(field for field in BURNOUT_FIELDS if field in burnout)
+    columns.extend(["mistreat_freq", "mistreat_from"])
     output = io.StringIO(newline="")
     writer = csv.writer(output)
     writer.writerow(columns)
     for response in responses:
-        writer.writerow(csv_cell(response.get(field, "")) for field in columns)
+        row = []
+        for field in columns:
+            value = response.get(field, "")
+            row.append(csv_cell(";".join(value) if isinstance(value, list) else value))
+        writer.writerow(row)
     return {
         "n": len(responses),
         "counts": counts,
         "fix_first": fixes,
         "burnout": burnout,
+        "mistreatment": mistreat,
         "free_text": [
             response["free_text"] for response in reversed(responses)
             if response.get("free_text")
@@ -156,6 +187,13 @@ def results_html(result):
             table(("Frequency", "Count"), tally["counts"].items()),
             f"<p>Weekly or more: {tally['weekly_or_more']}</p>",
         ])
+    mt = result["mistreatment"]
+    parts.extend([
+        f"<h2>Mistreatment since starting residency</h2><p>Any: {mt['any']} of {mt['answered']} who answered</p>",
+        table(("Frequency", "Count"), mt["freq"].items()),
+        "<h2>From whom (pick all that apply)</h2>",
+        table(("Source", "Count"), mt["from"].items()),
+    ])
     parts.extend([
         "<h2>Free text, newest first</h2>",
         table(("Answer",), ((answer,) for answer in result["free_text"])),
