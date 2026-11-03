@@ -108,9 +108,10 @@ def summarize(responses):
             mistreat["answered"] += 1
             if freq != "never":
                 mistreat["any"] += 1
-        for source in response.get("mistreat_from") or []:
-            if source in mistreat["from"]:
-                mistreat["from"][source] += 1
+        if freq != "never":  # a "never" answer with boxes ticked is a misclick
+            for source in response.get("mistreat_from") or []:
+                if source in mistreat["from"]:
+                    mistreat["from"][source] += 1
         for field in YES_NO_FIELDS:
             counts[field][response.get(field) or "blank"] += 1
         fixes[response.get("fix_first") or "blank"] += 1

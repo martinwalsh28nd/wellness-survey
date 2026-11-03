@@ -1,6 +1,6 @@
 # Wellness card, web version (spec)
 
-Note 2026-11-03: the shipped form has NINE items (mistreatment frequency and source added 11/3) (two Maslach burnout items were added after a literature check) and slightly different wording for items 4 and 5; `docs/ITEMS.md` is authoritative for item text and sources. The hosting and API sections below are current.
+Note 2026-11-03: the shipped form has nine items: the two Maslach burnout items, three post-ABSITE items, mistreatment frequency and source, fix-first A-F, and one free-text line. `docs/ITEMS.md` is authoritative for item text and sources; the hosting and API sections below are current.
 
 Purpose: an anonymous short survey for a surgery residency wellness talk on Tue 2026-11-03 07:00. Residents scan a QR code on a slide and answer on their phones. It mirrors a paper index card handed out in the room, so paper and web answers merge.
 

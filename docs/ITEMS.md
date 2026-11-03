@@ -1,6 +1,6 @@
 # Survey items and where they come from
 
-Checked against the PubMed abstracts and, for Hu 2019, the PMC full text on 2026-11-02. Nine items, about a minute. Items 1-7 are published; 8-9 are local.
+Checked against the PubMed abstracts and, for Hu 2019, the PMC full text on 2026-11-02. Nine items, about a minute. Items 1-7 draw on published surveys (rows 4-7 adapted, see notes); 8-9 are local.
 
 | # | Item (exact wording on the form) | Response | Source and status |
 |---|---|---|---|
