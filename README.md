@@ -10,7 +10,7 @@ The API binds to `127.0.0.1:8787`. `WELLNESS_RESULTS_KEY` protects results; keep
 Optional: `WELLNESS_PORT` (8787), `WELLNESS_DATA_DIR` (`~/.local/share/wellness-survey`); responses append to `responses.jsonl`.
 Smoke check: `scripts/smoke.sh http://127.0.0.1:8787 "$WELLNESS_RESULTS_KEY"` adds one sample card and prints `n`. Delete that line from `responses.jsonl` before quoting numbers.
 Funnel: `tailscale funnel --bg --https=10000 http://127.0.0.1:8787` exposes `https://mini.tailf65cf9.ts.net:10000`.
-GitHub Pages: select `main` and `/docs`; set custom domain `wellness.martingwalsh.solutions` (also in `docs/CNAME`).
+Frontend hosting (since 2026-11-03): Cloudflare Pages project `wellness-survey`, custom domain `wellness.martingwalsh.solutions` (CNAME `wellness` -> `wellness-survey.pages.dev` at Namecheap; Cloudflare issues and renews the certificate). Deploy after any change to `docs/`: `wrangler pages deploy docs --project-name wellness-survey --branch main` (wrangler is logged in on the mini).
 Fallback frontend: `https://martinwalsh28nd.github.io/wellness-survey/`.
 JSON results: `curl --get --data-urlencode "key=$WELLNESS_RESULTS_KEY" https://mini.tailf65cf9.ts.net:10000/api/results`.
 Add `-H 'Accept: text/html'` for a phone-readable table or `--data-urlencode 'format=csv'` for CSV.
