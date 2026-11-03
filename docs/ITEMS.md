@@ -10,7 +10,7 @@ Checked against the PubMed abstracts and, for Hu 2019, the PMC full text on 2026
 | 4 | Are you satisfied with how responsive the program is to resident concerns? | Yes / No | Adapted. The 2020 post-ABSITE survey measured "satisfaction with program responsiveness"; 72.1% satisfied, n=5,256 (Joung et al., J Surg Educ 2022, doi 10.1016/j.jsurg.2022.05.004). The exact item text is not in the abstract; this wording is ours. |
 | 5 | Are you unhappy with the time you have for routine health maintenance (doctor, dentist)? | Yes / No | Adapted. The 2020 post-ABSITE survey reported 48.0% "dissatisfied with time for performing routine health maintenance (eg dentist)" (Janczewski et al., J Am Coll Surg 2024, doi 10.1097/XCS.0000000000001135). Polarity kept as "unhappy" to match the paper card. |
 | 6 | Fix first (pick one): A-F | one of A-F | Local. The six program-specific options from the talk. |
-| 7 | One thing that makes the day worse and could actually be fixed | free text, optional | Local. |
+| 7 | One thing that makes the day worse and could be fixed | free text, optional | Local. |
 
 ## Scoring
 - Burnout symptoms: either item 1 or item 2 at "once a week" or more. This is the convention used in the national surgeon and resident surveys. Note the national general surgery figures (38.5% weekly in 2018, Hu et al., N Engl J Med 2019, doi 10.1056/NEJMsa1903759; 43% in 2019) used a six-item abbreviated MBI (three emotional exhaustion and three depersonalization items, any item weekly), so our two-item number is comparable in spirit, not identical. Hu 2019 also reports the single-domain rates: emotional exhaustion weekly 34.3%, depersonalization weekly 17.1%.

@@ -33,11 +33,11 @@ Heading: "Wellness card". Subheading: "no names, no PGY year. takes about 30 sec
 4. Fix first (pick one):
    A) a monthly "here's what changed" on what comes in through the anonymous channel
    B) Big Sib: every intern gets a senior who isn't grading them
-   C) out by 10 actually means out by 10, and someone covers
-   D) protected didactics actually protected
+   C) out by 10 means out by 10, and someone covers
+   D) protected didactics that stay protected
    E) float: Friday chief chat, real resident input on schedules
-   F) workroom: 3 more computers and a printer that actually works
-5. One thing that makes the day worse and could actually be fixed (optional, free text, 500 chars max)
+   F) workroom: 3 more computers and a printer that works
+5. One thing that makes the day worse and could be fixed (optional, free text, 500 chars max)
 Button: "Send it". Yes/No and A-F are big toggle buttons or radio cards, not tiny radios.
 
 After a successful submit, replace the form with: "Thanks. For comparison, nationally: 67% have a mentor who genuinely cares, 72% are satisfied with program responsiveness, 48% are unhappy with time for their own doctor/dentist." plus a line "You can close this." Set `localStorage.wellnessCardSent = 1` and on reload show the thanks view instead of the form (soft one-per-device; no server-side device tracking).
