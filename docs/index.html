@@ -160,6 +160,12 @@
       <p id="status" role="status" aria-live="polite"></p>
       <noscript><p>Turn on JavaScript to send this card.</p></noscript>
     </form>
+    <section id="pending" tabindex="-1" hidden>
+      <p><strong>Saved on your phone, not sent yet.</strong> This network could not reach the survey.</p>
+      <p>Leave this page open and it keeps trying on its own. Or turn wifi off for a second and tap Try again.</p>
+      <button id="retry" type="button">Try again</button>
+      <p id="pending-status" role="status" aria-live="polite"></p>
+    </section>
     <section id="thanks" tabindex="-1" hidden>
       <p>Thanks. For comparison, nationally: 38-43% of general surgery residents have weekly burnout symptoms, 67% have a mentor who genuinely cares, 72% are satisfied with program responsiveness, 48% are unhappy with time for their own doctor/dentist.</p>
       <p>You can close this.</p>
@@ -167,12 +173,39 @@
   </main>
   <script>
     const API_BASE = "https://mini.tailf65cf9.ts.net:10000";
+    const SENT_KEY = "wellnessCardSent";
+    const PENDING_KEY = "wellnessCardPending";
+    const RETRY_MS = 20000;
 
     const form = document.getElementById("card");
     const send = document.getElementById("send");
     const status = document.getElementById("status");
     const thanks = document.getElementById("thanks");
+    const pending = document.getElementById("pending");
+    const retry = document.getElementById("retry");
+    const pendingStatus = document.getElementById("pending-status");
     let sending = false;
+    let pendingCard = null;
+    let retryTimer = null;
+
+    function load(key) {
+      try { return localStorage.getItem(key); } catch (_) { return null; }
+    }
+
+    function save(key, value) {
+      try {
+        if (value === null) localStorage.removeItem(key); else localStorage.setItem(key, value);
+      } catch (_) {
+        // Private browsing: the card stays in memory while the page is open.
+      }
+    }
+
+    function newId() {
+      if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+      const bytes = new Uint8Array(16);
+      crypto.getRandomValues(bytes);
+      return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+    }
 
     function hasAnswer() {
       return Array.from(new FormData(form)).some(([name, value]) =>
@@ -184,66 +217,105 @@
       send.disabled = sending || !hasAnswer();
     }
 
-    function showThanks(focus = false) {
-      form.hidden = true;
-      thanks.hidden = false;
-      if (focus) thanks.focus();
+    function show(section, focus) {
+      form.hidden = section !== form;
+      pending.hidden = section !== pending;
+      thanks.hidden = section !== thanks;
+      if (focus && section !== form) section.focus();
     }
 
-    try {
-      if (localStorage.wellnessCardSent === "1") showThanks();
-    } catch (_) {
-      // Private browsing can make storage unavailable; the card still works.
-    }
-
-    form.addEventListener("input", updateButton);
-    form.addEventListener("change", updateButton);
-    updateButton();
-
-    form.addEventListener("submit", async (event) => {
-      event.preventDefault();
-      if (sending || !hasAnswer()) return;
-      const answers = Object.fromEntries(new FormData(form));
-      sending = true;
-      updateButton();
-      send.textContent = "Sending...";
-      status.textContent = "";
+    async function post(card) {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 15000);
-
       try {
         const response = await fetch(API_BASE + "/api/submit", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(answers),
+          body: JSON.stringify(card),
           credentials: "omit",
           referrerPolicy: "no-referrer",
           signal: controller.signal
         });
-        if (!response.ok) {
-          throw new Error(response.status === 429
-            ? "Too many cards at once. Wait a minute, then try again."
-            : "The card could not be sent. Wait a moment and try again.");
-        }
+        if (response.status === 400 || response.status === 413 || response.status === 415) return "rejected";
+        if (!response.ok) return "retry";
         const result = await response.json();
-        if (result.ok !== true) throw new Error("The card could not be sent. Wait a moment and try again.");
-        try {
-          localStorage.wellnessCardSent = 1;
-        } catch (_) {
-          // A saved response still gets a thank-you when storage is unavailable.
-        }
-        showThanks(true);
-      } catch (error) {
-        status.textContent = error.name === "AbortError" || error instanceof TypeError
-          ? "Could not confirm the send. Check your connection, wait a moment, and try again."
-          : error.message;
+        return result.ok === true ? "sent" : "retry";
+      } catch (_) {
+        return "retry";
       } finally {
         clearTimeout(timeout);
-        sending = false;
-        send.textContent = "Send it";
-        updateButton();
       }
+    }
+
+    function stopRetry() {
+      if (retryTimer) clearInterval(retryTimer);
+      retryTimer = null;
+    }
+
+    function startRetry() {
+      if (!retryTimer) retryTimer = setInterval(() => attempt(false), RETRY_MS);
+    }
+
+    async function attempt(fromForm) {
+      if (sending || !pendingCard) return;
+      sending = true;
+      updateButton();
+      if (fromForm) send.textContent = "Sending...";
+      retry.disabled = true;
+      pendingStatus.textContent = fromForm ? "" : "Trying again...";
+      const outcome = await post(pendingCard);
+      sending = false;
+      send.textContent = "Send it";
+      retry.disabled = false;
+      updateButton();
+      if (outcome === "sent") {
+        pendingCard = null;
+        save(PENDING_KEY, null);
+        save(SENT_KEY, "1");
+        stopRetry();
+        show(thanks, true);
+      } else if (outcome === "rejected") {
+        pendingCard = null;
+        save(PENDING_KEY, null);
+        stopRetry();
+        show(form, false);
+        status.textContent = "The card could not be sent. Please try once more.";
+      } else {
+        if (pending.hidden) show(pending, true);
+        pendingStatus.textContent = "Not sent yet. Trying again in a few seconds.";
+        startRetry();
+      }
+    }
+
+    form.addEventListener("input", updateButton);
+    form.addEventListener("change", updateButton);
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      if (sending || !hasAnswer()) return;
+      pendingCard = { ...Object.fromEntries(new FormData(form)), card_id: newId() };
+      save(PENDING_KEY, JSON.stringify(pendingCard));
+      status.textContent = "";
+      attempt(true);
     });
+
+    retry.addEventListener("click", () => attempt(false));
+    window.addEventListener("online", () => attempt(false));
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") attempt(false);
+    });
+
+    const stored = load(PENDING_KEY);
+    if (stored) {
+      try { pendingCard = JSON.parse(stored); } catch (_) { save(PENDING_KEY, null); }
+    }
+    if (pendingCard) {
+      show(pending, false);
+      attempt(false);
+    } else if (load(SENT_KEY) === "1") {
+      show(thanks, false);
+    }
+    updateButton();
   </script>
 </body>
 </html>

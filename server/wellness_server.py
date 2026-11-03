@@ -16,6 +16,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlsplit
 
 
+CARD_ID = re.compile(r"[A-Za-z0-9-]{8,64}")
 ALLOWED_ORIGINS = {
     "https://wellness.martingwalsh.solutions",
     "https://martinwalsh28nd.github.io",
@@ -64,6 +65,13 @@ def validate_answers(payload):
             if not isinstance(value, str) or value not in FREQUENCIES:
                 raise ValueError("Invalid burnout frequency.")
             answers[field] = value
+    card_id = payload.get("card_id")
+    if card_id is not None:
+        # Random per-card token from the phone; lets a retry after a lost reply
+        # land once instead of twice. Not tied to the person or the device.
+        if not isinstance(card_id, str) or not CARD_ID.fullmatch(card_id):
+            raise ValueError("Invalid card id.")
+        answers["card_id"] = card_id
     return answers
 
 
@@ -166,6 +174,8 @@ class WellnessServer(ThreadingHTTPServer):
         self.storage_lock = threading.Lock()
         self.rate_lock = threading.Lock()
         self.post_times = {}
+        self.seen_ids = {r["card_id"] for r in self.read_responses()
+                         if isinstance(r, dict) and r.get("card_id")}
         super().__init__(("127.0.0.1", port), WellnessHandler)
 
     def admit_post(self, address):
@@ -186,11 +196,17 @@ class WellnessServer(ThreadingHTTPServer):
     def append_response(self, answers):
         response = {"ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), **answers}
         line = json.dumps(response, ensure_ascii=True, separators=(",", ":")) + "\n"
+        card_id = answers.get("card_id")
         with self.storage_lock:
+            if card_id and card_id in self.seen_ids:
+                return  # already stored; the phone is retrying after a lost reply
             descriptor = os.open(self.data_file, os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o600)
             with os.fdopen(descriptor, "a", encoding="utf-8") as stream:
                 stream.write(line)
                 stream.flush()
+                os.fsync(stream.fileno())
+            if card_id:
+                self.seen_ids.add(card_id)
 
     def read_responses(self):
         with self.storage_lock:
