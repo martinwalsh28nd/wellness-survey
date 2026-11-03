@@ -314,6 +314,10 @@ class WellnessHandler(BaseHTTPRequestHandler):
             self.respond(400, {"error": "Invalid answers or JSON body."})
             return
         if answers is not None:
+            card_id = answers.get("card_id")
+            if card_id and card_id in self.server.seen_ids:
+                self.respond(200, {"ok": True})  # a retry of a stored card; no rate token
+                return
             if not self.server.admit_post(self.rate_address()):
                 self.respond(429, {"error": "Too many submissions. Try again in a minute."})
                 return
