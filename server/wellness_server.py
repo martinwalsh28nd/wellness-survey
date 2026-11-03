@@ -19,6 +19,7 @@ from urllib.parse import parse_qs, urlsplit
 CARD_ID = re.compile(r"[A-Za-z0-9-]{8,64}")
 ALLOWED_ORIGINS = {
     "https://wellness.martingwalsh.solutions",
+    "http://wellness.martingwalsh.solutions",  # served over http until GitHub issues the certificate
     "https://martinwalsh28nd.github.io",
 }
 YES_NO_FIELDS = ("mentor", "responsive", "health_time")
