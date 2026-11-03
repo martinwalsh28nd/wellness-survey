@@ -1,6 +1,6 @@
 # Survey items and where they come from
 
-Checked against the PubMed abstracts and, for Hu 2019, the PMC full text on 2026-11-02. Seven items, about 45 seconds. Items 1-5 are published; 6-7 are local.
+Checked against the PubMed abstracts and, for Hu 2019, the PMC full text on 2026-11-02. Nine items, about a minute. Items 1-7 are published; 8-9 are local.
 
 | # | Item (exact wording on the form) | Response | Source and status |
 |---|---|---|---|
@@ -9,8 +9,10 @@ Checked against the PubMed abstracts and, for Hu 2019, the PMC full text on 2026
 | 3 | Do you have a mentor who genuinely cares about you and your career? | Yes / No | Verbatim item from the national post-ABSITE survey of US general surgery residents; 66.8% yes, n=6,373 from 301 programs (Silver et al., JAMA Surg 2024, doi 10.1001/jamasurg.2024.0533). |
 | 4 | Are you satisfied with how responsive the program is to resident concerns? | Yes / No | Adapted. The 2020 post-ABSITE survey measured "satisfaction with program responsiveness"; 72.1% satisfied, n=5,256 (Joung et al., J Surg Educ 2022, doi 10.1016/j.jsurg.2022.05.004). The exact item text is not in the abstract; this wording is ours. |
 | 5 | Are you unhappy with the time you have for routine health maintenance (doctor, dentist)? | Yes / No | Adapted. The 2020 post-ABSITE survey reported 48.0% "dissatisfied with time for performing routine health maintenance (eg dentist)" (Janczewski et al., J Am Coll Surg 2024, doi 10.1097/XCS.0000000000001135). Polarity kept as "unhappy" to match the paper card. |
-| 6 | Fix first (pick one): A-F | one of A-F | Local. The six program-specific options from the talk. |
-| 7 | One thing that makes the day worse and could be fixed | free text, optional | Local. |
+| 6 | Since starting residency, how often have you been mistreated: bullied, verbally or emotionally abused, physically abused, discriminated against, or sexually harassed? | never / a few times a year / a few times a month / a few times a week / daily | Frequency scale and mistreatment types from the national post-ABSITE survey (Hu et al., N Engl J Med 2019, doi 10.1056/NEJMsa1903759, full text checked): nearly 50% reported at least one form of mistreatment; 30.3% verbal or physical abuse. Hu asked each type separately; this folds them into one item, and adds "bullied" (Nasca et al., J Surg Educ 2023). |
+| 7 | If ever, by whom? (pick all that apply) | attendings / other residents or fellows / patients or families / nurses or other staff / administrators | Same source categories as Hu 2019. Hu asked for the primary source per type (attendings were the top source of abuse, 51.9%; patients and families of gender and racial discrimination); pick-all-that-apply gives more local detail but is not directly comparable. |
+| 8 | Fix first (pick one): A-F | one of A-F | Local. The six program-specific options from the talk. |
+| 9 | One thing that makes the day worse and could be fixed | free text, optional | Local. |
 
 ## Scoring
 - Burnout symptoms: either item 1 or item 2 at "once a week" or more. This is the convention used in the national surgeon and resident surveys. Note the national general surgery figures (38.5% weekly in 2018, Hu et al., N Engl J Med 2019, doi 10.1056/NEJMsa1903759; 43% in 2019) used a six-item abbreviated MBI (three emotional exhaustion and three depersonalization items, any item weekly), so our two-item number is comparable in spirit, not identical. Hu 2019 also reports the single-domain rates: emotional exhaustion weekly 34.3%, depersonalization weekly 17.1%.
